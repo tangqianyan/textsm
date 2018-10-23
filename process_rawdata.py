@@ -7,14 +7,52 @@
 #Created Time:
 ############################
 import codecs
+import re
+
+
 
 indx_file_path = "../raw_data/cnn_stories/cnn_stories.index"
 data_file_path = "../raw_data/cnn_stories/stories/"
 
 def read_data(indx_file_path,data_file_path):
 
-    with codecs.open(indx_file_path,'r') as f:
-        for line in f:
-            indx_data_path = data_file_path + line.strip()
+    full_text = []
+    full_hightlight = []
+    with codecs.open(indx_file_path,'r') as fid:
+        for indx_line in fid:
+            indx_data_path = data_file_path + indx_line.strip()
             with codecs.open(indx_data_path,'r') as f:
-                for 
+                indx = 0
+                data_text = []
+                highlight_text = []
+                highlight_flag = False
+                for data_line in f:
+                    if data_line == '\n':
+                        continue
+                    if indx == 0:
+                        data_line = data_line.strip().split("--")[-1:]
+                        data_line = ' '.join(data_line)
+                        data_text.append(data_line)
+                        indx += 1
+                    else:
+                        if data_line.startswith("@highlight"):
+                            highlight_flag = True
+                        elif highlight_flag:
+                            highlight_text.append(data_line)
+                            highlight_flag = False
+                        else:
+                            data_text.append(data_line.strip())
+                if len(data_text)==1:
+                    print(indx_line)
+                full_text.append(data_text)
+                full_hightlight.append(highlight_text)
+                #print len(full_text)
+                #print len(full_hightlight)
+                #if len(highlight_text) == 0:
+                #print indx_line
+                #print highlight_text
+    return full_text,full_hightlight
+
+if __name__=="__main__":
+    full_text,full_hightlight = read_data(indx_file_path,data_file_path)
+    build_simi_matrix(full_text)
