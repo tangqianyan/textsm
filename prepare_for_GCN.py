@@ -19,7 +19,7 @@ def statis_node_property(simi_matrix):
 def select_node_seq(simi_matrix,stride=1,width=10):
     degree = np.sum(simi_matrix,axis=1)
     indx_degr = zip(range(len(degree)),degree)
-    indx_degr = sorted(indx_degr.items(),key=lambda x:x[1],reverse=True)
+    indx_degr = sorted(indx_degr,key=lambda x:x[1],reverse=True)
     node_w,_ = zip(*indx_degr)
     node_chosen = [node_w[i] for i in range(0,len(node_w),stride)]
     return node_chosen
