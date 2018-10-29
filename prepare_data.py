@@ -44,7 +44,7 @@ def prepare_gcn_data():
                 receptive_field.append(doc_sent_vec[v])
             data_doc.append(receptive_field)
         data_final.append(data_doc)
-    return data_final
+    return data_final,full_hightlight
 
 #if __name__=="__main__":
 #    main()
