@@ -9,27 +9,33 @@
 import tensorflow as tf
 import numpy as np
 import make_input_data
+import gcn
 
+NUM_LAYERS = 2
+HIDDEN_SIZE = 1024
+BATCH_SIZE = 1
+NUM_EPOCH = 1
+WORD_VOCAB_SIZE = 40000
 class GCNTSUM(object):
 
     def __init__(self):
-        self.enc_cell = gcn()
+        self.enc_cell = gcn
         self.dec_cell = tf.nn.rnn_cell.MultiRNNCell(
-            [tf.nn.rnn_cell.BasicLSTMCell(HIDDEN_SIZE)]
-            for _ in range(NUM_LAYERS))
+            [tf.nn.rnn_cell.BasicLSTMCell(HIDDEN_SIZE)
+            for _ in range(NUM_LAYERS)])
 
         self.word_embedding = tf.get_variable(
             "word_emb",
             [WORD_VOCAB_SIZE,HIDDEN_SIZE])
 
-    def forward(self,src_input,src_size,trg_input,trg_label,trg_size):
+    def forward(self,src_input,src_size,trg_input,trg_label,trg_size=0):
         batch_size = tf.shape(src_input)[0]
 
         src_emb = tf.nn.embedding_lookup(self.word_embedding,src_input)
         trg_emb = tf.nn.embedding_lookup(self.word_embedding,trg_input)
 
         with tf.variable_scope("encoder"):
-            enc_outputs = gcn(src_emb,src_size,dtype=tf.float32)
+            enc_outputs = gcn.inference(src_emb,src_size,dtype=tf.float32)
 
         with tf.variable_scope("decoder"):
             dec_outputs,_ = tf.nn.dynamic_rnn(self.dec_cell,
@@ -83,7 +89,8 @@ def main():
 
     data = make_input_data.MakeDataset()
     iterator = data.make_initializable_iterator()
-    (src,src_size),(trg_input,trg_label,trg_size) = iterator.get_next()
+    #(src,src_size),(trg_input,trg_label,trg_size) = iterator.get_next()
+    src,trg_input,trg_label,trg_size = iterator.get_next()
     cost_op, train_op = train_model.forward(src,
                                            src_size,
                                            trg_input,

@@ -24,7 +24,6 @@ CONV2_H = seq_size
 CONV2_W = 1
 CONV2_D = 1
 
-
 def inference(input_tensor,train,regularizer):
 
     with tf.variable_scope('layer1-conv1'):
