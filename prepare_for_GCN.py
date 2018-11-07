@@ -27,8 +27,6 @@ def select_node_seq(simi_matrix,stride=1,width=10):
 def assembly_neighbour(simi_matrix,target_node,filed_size=5):
     degree = np.sum(simi_matrix,axis=1)
     indx_degr = dict(zip(range(len(degree)),degree))
-    #simi_matrix = np.matrix(simi_matrix)
-    #shape = simi_matrix.shape()
     queue_1 = []
     queue_2 = []
     queue_1.append(target_node)
@@ -41,6 +39,8 @@ def assembly_neighbour(simi_matrix,target_node,filed_size=5):
                 if simi_matrix[v][i] != 0 and flag[i] == 0:
                     queue_2.append(i)
                     flag[i] = 1
+        if len(queue_2) == 0:
+            continue
         node = sort_node(indx_degr,queue_2)
         neighbour_list.extend(node)
         queue_1 = []

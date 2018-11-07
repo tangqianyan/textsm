@@ -31,11 +31,13 @@ class GCNTSUM(object):
     def forward(self,src_input,src_size,trg_input,trg_label,trg_size=0):
         batch_size = tf.shape(src_input)[0]
 
-        src_emb = tf.nn.embedding_lookup(self.word_embedding,src_input)
+        #src_emb = tf.nn.embedding_lookup(self.word_embedding,src_input)
         trg_emb = tf.nn.embedding_lookup(self.word_embedding,trg_input)
 
         with tf.variable_scope("encoder"):
-            enc_outputs = gcn.inference(src_emb,src_size,dtype=tf.float32)
+            enc_outputs = gcn.inference(src_input,src_size,0)
+            enc_outputs = tf.squeeze(enc_outputs)
+            enc_outputs = tf.reshape(enc_outputs,(batch_size,50))
 
         with tf.variable_scope("decoder"):
             dec_outputs,_ = tf.nn.dynamic_rnn(self.dec_cell,
@@ -91,6 +93,8 @@ def main():
     iterator = data.make_initializable_iterator()
     #(src,src_size),(trg_input,trg_label,trg_size) = iterator.get_next()
     src,trg_input,trg_label,trg_size = iterator.get_next()
+    src_size = 0
+    print(src.shape)
     cost_op, train_op = train_model.forward(src,
                                            src_size,
                                            trg_input,

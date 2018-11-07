@@ -25,7 +25,9 @@ CONV2_W = 1
 CONV2_D = 1
 
 def inference(input_tensor,train,regularizer):
-
+    input_tensor = tf.cast(input_tensor,dtype=tf.float32)
+    input_tensor = tf.reshape(input_tensor,(1,6,50,1))
+    #print(input_tensor.shape)
     with tf.variable_scope('layer1-conv1'):
         conv1_weights = tf.get_variable(
             "weight",
@@ -59,9 +61,10 @@ def inference(input_tensor,train,regularizer):
     return relu2
 
 if __name__=="__main__":
-    num = np.ones((2,6,4,1))
+    num = np.ones((1,6,50,1))
     num = tf.convert_to_tensor(num,tf.float32)
     m = inference(num,0,0)
+    m = tf.squeeze(m)
     with tf.Session() as sess:
         init = tf.global_variables_initializer()
         sess.run(init)

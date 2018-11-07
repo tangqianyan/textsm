@@ -38,8 +38,8 @@ def build_simi_matrix(document):
             simi_matrix[j][i] = num
 
     num_list = np.sum(simi_matrix,axis=1)
-    for i in range(len(num_list)):
-        print str(i) + ":" + str(i*2+1) + ": " + str(num_list[i])
+    #for i in range(len(num_list)):
+    #    print str(i) + ":" + str(i*2+1) + ": " + str(num_list[i])
 
     np.savetxt('ss.txt',simi_matrix,fmt='%d')
     return simi_matrix
