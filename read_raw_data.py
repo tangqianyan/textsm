@@ -20,12 +20,12 @@ def read_data():
 
     full_text = []
     full_hightlight = []
-    indx = 0
+    indx1 = 0
     with codecs.open(indx_file_path,'r') as fid:
         for indx_line in fid:
-            if indx > 1000:
+            if indx1 > 100:
                 break
-            indx += 1
+            indx1 += 1
             indx_data_path = data_file_path + indx_line.strip()
             with codecs.open(indx_data_path,'r') as f:
                 indx = 0

@@ -33,9 +33,6 @@ def prepare_gcn_data():
     hightlight_final = []
     indx = 0
     for i in range(len(full_text)):
-        #if i == 49:
-        #    print full_text[i]
-        #print "document: " + str(i)
         document = full_text[i]
         if len(document) < 10:
             continue
