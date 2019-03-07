@@ -16,11 +16,12 @@ import cPickle
 import pickle
 import random
 
+
 indx_file_path = "../raw_data/cnn_stories/cnn_stories.index"
 data_file_path = "../raw_data/cnn_stories/stories/"
 sent_file_path = "../data/cnn_stories/cnn_stories_sent_highlight_vec_50.p"
 
-def prepare_gcn_data():
+def prepare_gcn_data(stride=1,width=10,filed_size=5):
     print("prepare data ...")
 
     #full_text,full_hightlight_num = process_rawdata.process_raw_data(indx_file_path,data_file_path)
@@ -37,16 +38,16 @@ def prepare_gcn_data():
         if len(document) < 10:
             continue
         indx += 1
-        if indx > 5:
+        if indx > 100:
             break
         doc_sent_vec = sent_vec_list[i]
         simi_matrix = build_simi_matrix.build_simi_matrix(document)
-        nodes_selected = prepare_for_GCN.select_node_seq(simi_matrix,1,10)
+        nodes_selected = prepare_for_GCN.select_node_seq(simi_matrix,stride,width)
+        data_doc = []
         for node in nodes_selected:
             neighbors = []
-            data_doc = []
             receptive_field = []
-            neighbors = prepare_for_GCN.assembly_neighbour(simi_matrix,node,5)
+            neighbors = prepare_for_GCN.assembly_neighbour(simi_matrix,node,filed_size)
             neighbors = [node] + neighbors
             for v in neighbors:
                 receptive_field.append(doc_sent_vec[v])

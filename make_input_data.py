@@ -34,7 +34,7 @@ def MakeDataset():
             src_data_new.append(src_data[i])
             trg_input_data_new.append([SOS_ID]+ trg_data[i][0])
             trg_label_data_new.append(trg_data[i][0] + [EOS_ID])
-            trg_size.append(len(trg_data[i]))
+            trg_size.append([len(trg_data[i][0])])
  
 
     src_data_new = np.array(src_data_new)

@@ -13,9 +13,9 @@ import gcn
 
 CHECKPOINT_PATH="../model/seq2seq_ckpt"
 NUM_LAYERS = 1
-HIDDEN_SIZE = 87
+HIDDEN_SIZE = 50
 BATCH_SIZE = 1
-NUM_EPOCH = 1
+NUM_EPOCH = 2
 WORD_VOCAB_SIZE = 40000
 MAX_GRAD_NORM = 5
 class GCNTSUM(object):
@@ -60,15 +60,15 @@ class GCNTSUM(object):
             #enc_outputs = (enc_outputs,enc_outputs)
 
         with tf.variable_scope("decoder"):
-            h0 = self.dec_cell.zero_state(1,np.float32)
-            #h0 = enc_outputs
+            #h0 = self.dec_cell.zero_state(1,np.float32)
+            h0 = enc_outputs
             #h0 = tf.convert_to_tensor(np.ones((1,50)))
-            #h0 = tf.cast(h0,tf.float32)
-            #h0 = (h0,)
+            h0 = tf.cast(h0,tf.float32)
+            h0 = (h0,)
             #h0 = tf.tuple([h0])
-            print h0
-            print trg_emb
-            print trg_emb.shape
+            #print h0
+            #print trg_emb
+            #print trg_emb.shape
             #trg_emb = tf.reshape(trg_emb,shape=(1,shape1[0],shape1[1]))
             #trg_emb = tf.convert_to_tensor([trg_emb])
             dec_outputs,_ = tf.nn.dynamic_rnn(self.dec_cell,
@@ -76,14 +76,17 @@ class GCNTSUM(object):
                                              trg_size,
                                              initial_state=h0)
 
+        #print dec_outputs
         output = tf.reshape(dec_outputs,[-1,HIDDEN_SIZE])
+        #print output
+        #print self.softmax_weight
         logits = tf.matmul(output,self.softmax_weight) + self.softmax_bias
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=tf.reshape(trg_label,[-1]),
                                                               logits=logits)
 
         label_weights = tf.sequence_mask(trg_size,
-                                        #maxlen=tf.shape(trg_label)[1],
-                                         maxlen=50,
+                                        maxlen=tf.shape(trg_label)[1],
+                                        # maxlen=50,
                                         dtype=tf.float32)
 
         label_weights = tf.reshape(label_weights,[-1])
@@ -143,19 +146,27 @@ def main():
         data = make_input_data.MakeDataset()
         iterator = data.make_initializable_iterator()
         src,trg_input,trg_label,trg_size = iterator.get_next()
-        trg_input = tf.squeeze(trg_input)
-        trg_input = tf.reshape(trg_input,(1,87))
+        #print trg_size
+        #trg_input = tf.squeeze(trg_input)
+        print src
+        print trg_input
+        #print trg_size.eval()
+        trg_size = tf.squeeze(trg_size)
+        trg_input = tf.reshape(trg_input,(1,-1))
         trg_label = tf.squeeze(trg_label)
-        trg_label = tf.reshape(trg_label,(1,87))
+        trg_label = tf.reshape(trg_label,(1,-1))
+        print trg_size
         trg_size = np.array([87])
+        #print trg_size
+        #trg_size = tf.reshape(trg_size,(1,-1))
         #trg_label = tf.reshape(trg_label,(1,trg_label.shape[0]))
     else:
         src = tf.convert_to_tensor(np.zeros((1,6,50)))
-        trg_input = tf.convert_to_tensor(np.ones((1,50)))
+        trg_input = tf.convert_to_tensor(np.ones((1,100)))
         trg_input = tf.cast(trg_input,tf.int32)
-        trg_label = tf.convert_to_tensor(np.ones((1,50)))
+        trg_label = tf.convert_to_tensor(np.ones((1,100)))
         trg_label = tf.cast(trg_label,tf.int32)
-        trg_size = np.array([50])
+        trg_size = np.array([100])
     cost_op, train_op,h0 = train_model.forward(src,
                                            src_size,
                                            trg_input,
@@ -168,13 +179,14 @@ def main():
         tf.global_variables_initializer().run()
         for i in range(NUM_EPOCH):
             print ("In iteration: %d" %(i+1))
-            #sess.run(iterator.initializer)
+            sess.run(iterator.initializer)
             #print h0.eval()
             #print trg_input.eval()
-            #step = run_epoch(sess,
-            #                cost_op,
-            #                train_op,
-            #                saver,
-            #                step)
+            print trg_size
+            step = run_epoch(sess,
+                            cost_op,
+                            train_op,
+                            saver,
+                            step)
 if __name__ == "__main__":
     main()
